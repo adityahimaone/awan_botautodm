@@ -1,7 +1,7 @@
 from twitter import Twitter
 import time
 
-
+#deploy ke heroku
 tw = Twitter()
 
 def start():
