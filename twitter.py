@@ -13,7 +13,7 @@ class Twitter:
 
     # Initializing tweepy
     def __init__(self):
-        print("initializing twitter....")
+        print("initializing twitter bot....")
         self.inits = tweepy.OAuthHandler(constants.CONSUMER_KEY, constants.CONSUMER_SCRET)
         self.inits.set_access_token(constants.ACCESS_KEY, constants.ACCESS_SECRET)
         self.api = tweepy.API(self.inits)
@@ -90,7 +90,21 @@ class Twitter:
         except Exception as e:
             print(e)
             pass
-    
+
+    def post_quotes(self):
+        print("Uploading..")
+        try:
+             self.api.update_with_media(filename="ready.png")
+        except Exception as e:
+            print(e)
+            pass
+
+    def get_user_screen_name(self, id):
+        print("Getting username")
+        api = self.init_tweepy()
+        user = api.get_user(id)
+        return user.screen_name
+
     # Post a tweet with media, (Photo or Video)
     # If you want to upload some gifs, create a new elif type == 'theTypeOfGifs' 
     def post_tweet_with_media(self, tweet, media_url, shorted_media_url, type):

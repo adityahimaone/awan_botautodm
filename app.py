@@ -1,11 +1,9 @@
 from twitter import Twitter
 import time
 from media import Media
-from twitterquot import Quotes
 
 #deploy ke heroku
 tw = Twitter()
-qt = Quotes()
 media = Media()
 
 def start():
@@ -20,18 +18,37 @@ def start():
                 id = dms[i]['id']
 
                 if len(message) != 0 and len(message) < 280:
-                    # prikitiw is the keyword
-                    # if you want to turn off the case sensitive like: priktiw, Prikitiw, pRiKiTiw
+                    # lol is the keyword
+                    # if you want to turn off the case sensitive like: lol , Lol, LOL
                     # just use lower(message) and check it, but please remove the replace function line
-                    if "lol" or"LOL" or "Lol" in message:
-                        message = message.replace("https://", "")
-                       # message = message.replace("prikitiw", "")
+                    if "lol" or "LOL" or "Lol" in message:
+                        print("lol keyword found")
+                       # message = message.replace("https://", "")
+                       # message = message.replace("lol", "")
                         if len(message) != 0:
                             if dms[i]['media'] is None:
-                                print("DM will be posted")
-
-                                tw.post_tweet(message)
-                                tw.delete_dm(id)
+                                if "quotes" in message:
+                                    print("quotes keyword found, quotes will be uploud")
+                                    message = message.replace("quotes", "")
+                                    if "https://" not in message and "http://" not in message:
+                                        if "--s" in message:
+                                            message = message.replace("--s", "")
+                                            screen_name = tw.get_user_screen_name(sender_id)
+                                            media.download_image()
+                                            media.process_image(message, screen_name)
+                                            tw.post_quotes()
+                                            tw.delete_dm(id)
+                                        else:
+                                            media.download_image()
+                                            media.process_image(message, None)
+                                            tw.post_quotes()
+                                            tw.delete_dm(id)
+                                    else:
+                                        tw.delete_dm(id)
+                                else:
+                                    print("DM will be posted")
+                                    tw.post_tweet(message)
+                                    tw.delete_dm(id)
                             else:
                                 print("DM will be posted with media")
                                 print(dms[i]['shorted_media_url'])
@@ -40,23 +57,7 @@ def start():
                         else:
                             print("DM deleted because its empty..")
                             tw.delete_dm(id)
-                    elif "quotes" in message:
-                        message = message.replace("quotes", "")
-                        if "https://" not in message and "http://" not in message:
-                            if "--s" in message:
-                                message = message.replace("--s", "")
-                                screen_name = qt.get_user_screen_name(sender_id)
-                                media.download_image()
-                                media.process_image(message, screen_name)
-                                qt.post_tweet()
-                                qt.delete_dm(id)
-                            else:
-                                media.download_image()
-                                media.process_image(message, None)
-                                qt.post_tweet()
-                                qt.delete_dm(id)
-                        else:
-                            qt.delete_dm(id)
+
                     else:
                         print("DM will be deleted because does not contains keyword..")
                         tw.delete_dm(id)
