@@ -1,8 +1,12 @@
 from twitter import Twitter
 import time
+from media import Media
+from twitterquot import Quotes
 
 #deploy ke heroku
 tw = Twitter()
+qt = Quotes()
+media = Media()
 
 def start():
     print("Starting program...")
@@ -19,7 +23,7 @@ def start():
                     # prikitiw is the keyword
                     # if you want to turn off the case sensitive like: priktiw, Prikitiw, pRiKiTiw
                     # just use lower(message) and check it, but please remove the replace function line
-                    if "lol" in message:
+                    if "lol" or"LOL" or "Lol" in message:
                         message = message.replace("https://", "")
                        # message = message.replace("prikitiw", "")
                         if len(message) != 0:
@@ -36,6 +40,23 @@ def start():
                         else:
                             print("DM deleted because its empty..")
                             tw.delete_dm(id)
+                    elif "quotes" in message:
+                        message = message.replace("quotes", "")
+                        if "https://" not in message and "http://" not in message:
+                            if "--s" in message:
+                                message = message.replace("--s", "")
+                                screen_name = qt.get_user_screen_name(sender_id)
+                                media.download_image()
+                                media.process_image(message, screen_name)
+                                qt.post_tweet()
+                                qt.delete_dm(id)
+                            else:
+                                media.download_image()
+                                media.process_image(message, None)
+                                qt.post_tweet()
+                                qt.delete_dm(id)
+                        else:
+                            qt.delete_dm(id)
                     else:
                         print("DM will be deleted because does not contains keyword..")
                         tw.delete_dm(id)
@@ -46,7 +67,7 @@ def start():
             print("Direct message is empty...")
             dms = tw.read_dm()
             if len(dms) == 0 or dms is None:
-                time.sleep(60)
+                time.sleep(10)
 
 if __name__ == "__main__":
     start()
